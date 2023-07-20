@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Random Code Generator noon Grocery</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+
+  <style> 
+    input[type=text] {
+      width: 50%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+
+    input[type=number] {
+      width: 50%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+  
+    </style>
+
+
+</head>
+<body>
+  <h1>Random Code Generator noon Grocery</h1>
+  <form id="codeGeneratorForm">
+    <label for="prefix">Prefix:</label>
+    <input type="text" id="prefix" required><br>
+
+    <label for="numCodes">Number of Codes:</label>
+    <input type="number" id="numCodes" min="1" required><br>
+
+    <label for="codeLength">Code Length:</label>
+    <input type="number" id="codeLength" min="1" required><br>
+
+    <button type="button" onclick="generateCodes()">Generate Codes</button>
+  </form>
+
+  <script>
+    function generateRandomCode(prefix, length) {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      let code = prefix;
+
+      for (let i = prefix.length; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        code += characters.charAt(randomIndex);
+      }
+
+      return code;
+    }
+
+    function generateCodes() {
+      const prefix = document.getElementById('prefix').value.toUpperCase();
+      const numCodes = parseInt(document.getElementById('numCodes').value);
+      const codeLength = parseInt(document.getElementById('codeLength').value);
+
+      if (isNaN(numCodes) || isNaN(codeLength) || numCodes <= 0 || codeLength <= 0) {
+        alert('Please enter valid numbers for number of codes and code length.');
+        return;
+      }
+
+      const codes = [];
+      let attempt = 1;
+
+      while (codes.length < numCodes) {
+        const code = generateRandomCode(prefix, codeLength);
+        if (!codes.includes(code)) {
+          codes.push(code);
+        } else {
+          attempt++;
+          if (attempt > 1000) {
+            alert('Unable to generate the given number of unique codes. Please increase the length.');
+            return;
+          }
+        }
+      }
+
+      const data = [['Generated Codes']];
+      codes.forEach(code => data.push([code]));
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb, ws, 'Codes');
+      XLSX.writeFile(wb, 'generated_codes.xlsx');
+
+      alert('Codes generated successfully and saved in generated_codes.xlsx');
+    }
+  </script>
+</body>
+</html>
